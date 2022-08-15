@@ -13,19 +13,13 @@ inputForm.addEventListener('input', debounce(event => {
     countryList.innerHTML = '';
     if (data) {
         fetchCountries(data)
-            .then(resp => {
-                if (resp && resp.length === 1) {
-                    render(resp, 'info');
-                } else if (resp) {
-                    render(resp, 'list');
-                };
-            });
+            .then(resp => {if (resp){render(resp)}});
     };
 }, DEBOUNCE_DELAY));
 
-function render(resp, trg) {
+function render(resp) {
     resp.map(({ capital, flags, languages, name, population }) => {
-        if (trg === 'info') {
+        if (resp.length === 1) {
             countryInfo.innerHTML = `
                 <div class="articleTitle">
                     <img class="examples__img" src="${flags.svg}" alt="Прапор країни" height="40"/>
@@ -33,8 +27,9 @@ function render(resp, trg) {
                 </div>
                 <p><b>Capital:</b> ${capital[0]}</p>
                 <p><b>Population:</b> ${population}</p>
-                <p><b>Languages:</b> ${Object.values(languages).reduce((acc, el, i) => i === 0 ? acc = `${el}` : acc += `, ${el}`, [])}</p>`;
-        } else if (trg === 'list') {
+                <p><b>Languages:</b> ${Object.values(languages).reduce((acc, el, i) => i === 0 ? acc = `${el}` : acc += `, ${el}`, [])}</p>
+            `;
+        } else {
             countryList.insertAdjacentHTML('beforeend', `
                 <div class="articleTitle">
                     <img class="examples__img" src="${flags.svg}" alt="Прапор країни" width="40px"/>
