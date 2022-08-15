@@ -1,5 +1,6 @@
 import './css/styles.css';
 import { fetchCountries } from './fetchCountries.js';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from "lodash.debounce";
 
 const DEBOUNCE_DELAY = 300;
@@ -13,7 +14,14 @@ inputForm.addEventListener('input', debounce(event => {
     countryList.innerHTML = '';
     if (data) {
         fetchCountries(data)
-            .then(resp => {if (resp){render(resp)}});
+            .then(resp => {
+                if (resp && resp.length > 10) {
+                    Notify.info('Too many matches found. Please enter a more specific name.');
+                } else if (resp) {
+                    render(resp);
+                };
+            })
+            .catch(() => {Notify.failure('Oops, there is no country with that name')});
     };
 }, DEBOUNCE_DELAY));
 
@@ -27,7 +35,7 @@ function render(resp) {
                 </div>
                 <p><b>Capital:</b> ${capital[0]}</p>
                 <p><b>Population:</b> ${population}</p>
-                <p><b>Languages:</b> ${Object.values(languages).reduce((acc, el, i) => i === 0 ? acc = `${el}` : acc += `, ${el}`, [])}</p>
+                <p><b>Languages:</b> ${Object.values(languages).join(', ')}</p>
             `;
         } else {
             countryList.insertAdjacentHTML('beforeend', `
